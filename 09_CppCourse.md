@@ -115,9 +115,7 @@ int main()
 ---
 ## Constructors
 
-* The primary purpose of a constructor is to initialize objects of a class.
-* This initialization may involve setting initial values for member variables, allocating resources, or setting up any other state necessary
-* for the newly created object to be used.
+* The primary purpose of a constructor is to initialize objects of a class. This initialization may involve setting initial values for member variables, allocating resources, or setting up any other state necessary for the newly created object to be used.
 
 Example :
 ```cpp
@@ -134,6 +132,7 @@ private:
 * The Constructor of a class must have the same name as the class.
   
 * The Constructor is a function that has no 'concept' of return value.
+
 Example :
 ```cpp
 class Eni {
@@ -159,6 +158,7 @@ int main() {
 ```
   
 * Constructor can be overloaded.
+
 Example :
 ```cpp
 // The constructor has 5 overloads.
@@ -172,6 +172,23 @@ private:
 };
 ```
 * Cannot be called using . or -> operators
+
+Example :
+```cpp
+class ex_class_12 {
+public:
+	ex_class_12();
+	ex_class_12(int x);
+	void foo();
+};
+
+int main()
+{
+	ex_class_12 myclass;
+	myclass.foo();			// ok
+	myclass.ex_class_12(12);	// error, cannot call ctor with . operator
+}
+```
 
 Example :
 ```cpp
@@ -299,10 +316,877 @@ void ex_class_8::func(int)	// or inline void ex_class_8::func(int)
 ```
 If i include this header in 2 files, `ODR is not violated`
 
+## Destructor
 
+* Used to end the life of the object of a class.
+* The Destructor is a non-static member function.
+* The Destructor of a class must have the same name as the class but ~ is put in front of the function.
+
+Example :
+```cpp
+class ex_class_10 {
+private:
+	ex_class_10(int x);	// constructor
+	~ex_class_10();		// destructor
+};
+```
+
+* The Destructor is a function that has no 'concept' of return value.
+* The Destructor cannot be a free function (global function).
+* The Destructor cannot be a static member function or const member function.
+* 'this' can be used in its definition.
+* Can be public, private, protected.
+* Destructor CANNOT be overloaded.
+* Destructor must have a 'void' parameter list
+* Destructor can be called using . or -> operators
+
+Example :
+```cpp
+class ex_class_12 {
+public:
+	ex_class_12();
+	ex_class_12(int x);
+	void foo();
+};
+
+int main()
+{
+	ex_class_12 myclass;
+	myclass.foo();	// ok
+	myclass.ex_class_12(12);	// error, cannot call ctor with . operator
+	myclass.~ex_class_12();		// ok, can call dtor with . operator but it is not very common 
+}
+```
+
+## Storage Classes 
+* static storage class
+* automatic storage class
+* dynamic storage class
+* thread-local storage class
+
+The following classes have **static life-span**:
+- global variables
+- static local variables
+- static data members of a class
+
+Example :
+```cpp
+class ex_class_13{
+public:
+	ex_class_13()
+	{
+		std::cout << "ex_class_13() this = " << this << '\n';
+	}
+
+	~ex_class_13()
+	{
+		std::cout << "ex_class_13 destructor this = " << this << '\n';
+	}
+};
+
+ex_class_13 gex_class;
+
+int main()
+{
+	std::cout << "main starting\n";
+	std::cout << "&gex_class = " << &gex_class << "\n";
+	std::cout << "main continuing\n";
+	std::cout << "main ending\n";
+}
+```
+Output:
+```
+ex_class_13() this = 00007FF6267A1180
+main starting
+&gex_class = 00007FF6267A1180
+main continuing
+main ending
+ex_class_13 destructor this = 00007FF6267A1180
+```
+---
+
+Example :
+```cpp
+class ex_class_14 {
+public:
+	ex_class_14()
+	{
+		std::cout << "ex_class_14() this = " << this << '\n';
+	}
+
+	~ex_class_14()
+	{
+		std::cout << "ex_class_14 destructor this = " << this << '\n';
+	}
+	void foo()
+	{
+		//..
+	}
+
+	void bar()
+	{
+		//..
+	}
+
+int main()
+{
+	std::cout << &ex_class_14::foo << '\n';		// these functions also have an address in memory
+	std::cout << &ex_class_14::bar << '\n';
+}
+
+```
+---
+
+When a class has multiple constructors, the specific constructor called during object creation depends on the arguments provided when the object is instantiated.
+
+Example :
+```cpp
+class ex_class_15 {
+public:
+	ex_class_15()
+	{
+		std::cout << "ex_class_15() this = " << this << '\n';
+	}
+
+	ex_class_15(int)
+	{
+		std::cout << "ex_class_15(int) this = " << this << '\n';
+	}
+
+	~ex_class_15()
+	{
+		std::cout << "ex_class_15 destructor this = " << this << '\n';
+	}
+};
+
+ex_class_15 gex_class;
+
+int main()
+{
+	std::cout << "main starting\n";
+	std::cout << "&gex_class = " << &gex_class << "\n";
+	std::cout << "main continuing\n";
+	std::cout << "main ending\n";
+}
+```
+Output:
+```
+ex_class_15() this = 00007FF792701200
+main starting
+&gex_class = 00007FF792701200
+main continuing
+main ending
+ex_class_15 destructor this = 00007FF792701200
+```
+---
+
+Example :
+```cpp
+class ex_class_16 {
+public:
+	ex_class_16()
+	{
+		std::cout << "ex_class_16() this = " << this << '\n';
+	}
+
+	ex_class_16(int)
+	{
+		std::cout << "ex_class_16(int) this = " << this << '\n';
+	}
+
+	~ex_class_16()
+	{
+		std::cout << "ex_class_16 destructor this = " << this << '\n';
+	}
+};
+
+ex_class_16 gex_class(5);
+
+int main()
+{
+	std::cout << "main starting\n";
+	std::cout << "&gex_class = " << &gex_class << "\n";
+	std::cout << "main continuing\n";
+	std::cout << "main ending\n";
+}
+```
+Output:
+```
+ex_class_16(int) this = 00007FF6BFC11200
+main starting
+&gex_class = 00007FF6BFC11200
+main continuing
+main ending
+ex_class_16 destructor this = 00007FF6BFC11200
+```
+---
+
+Example :
+```cpp
+class ex_class_17 {
+public:
+	ex_class_17()
+	{
+		std::cout << "ex_class_17() this = " << this << '\n';
+	}
+
+	~ex_class_17()
+	{
+		std::cout << "ex_class_17 destructor this = " << this << '\n';
+	}
+};
+
+void foo()
+{
+	static ex_class_17 x;
+
+}
+
+int main()
+{
+	std::cout << "main starting\n";
+	foo();
+	std::cout << "main ending\n";
+}
+
+```
+Output:
+```
+main starting
+ex_class_17() this = 00007FF7746D0200
+main ending
+ex_class_17 destructor this = 00007FF7746D0200
+```
+---
+
+Example :
+```cpp
+class ex_class_18 {
+public:
+	ex_class_18()
+	{
+		std::cout << "ex_class_18() this = " << this << '\n';
+	}
+
+	~ex_class_18()
+	{
+		std::cout << "ex_class_18 destructor this = " << this << '\n';
+	}
+};
+
+void foo()
+{
+	std::cout << "foo called\n";
+	static ex_class_18 x;
+}
+
+int main()
+{
+	std::cout << "main starting\n";
+	foo();		// constructor is called only once
+	foo();
+	foo();
+	foo();
+	foo();
+	std::cout << "main ending\n";
+}
+```
+Output:
+```
+main starting
+foo called
+ex_class_18() this = 00007FF65B530200
+foo called
+foo called
+foo called
+foo called
+main ending
+ex_class_18 destructor this = 00007FF65B530200
+```
+---
+Example :
+```cpp
+class ex_class_19 {
+public:
+	ex_class_19()
+	{
+		std::cout << "ex_class_19() this = " << this << '\n';
+	}
+
+	~ex_class_19()
+	{
+		std::cout << "ex_class_19 destructor this = " << this << '\n';
+	}
+	char buf[256]{};
+};
+
+ex_class_19 ar[16];
+
+int main()
+{
+	std::cout << "main starting\n";
+	std::cout << "main ending\n";
+}
+```
+Output:
+```
+ex_class_19() this = 00007FF6660C1200
+ex_class_19() this = 00007FF6660C1300
+ex_class_19() this = 00007FF6660C1400
+ex_class_19() this = 00007FF6660C1500
+ex_class_19() this = 00007FF6660C1600
+ex_class_19() this = 00007FF6660C1700
+ex_class_19() this = 00007FF6660C1800
+ex_class_19() this = 00007FF6660C1900
+ex_class_19() this = 00007FF6660C1A00
+ex_class_19() this = 00007FF6660C1B00
+ex_class_19() this = 00007FF6660C1C00
+ex_class_19() this = 00007FF6660C1D00
+ex_class_19() this = 00007FF6660C1E00
+ex_class_19() this = 00007FF6660C1F00
+ex_class_19() this = 00007FF6660C2000
+ex_class_19() this = 00007FF6660C2100
+main starting
+main ending
+ex_class_19 destructor this = 00007FF6660C2100
+ex_class_19 destructor this = 00007FF6660C2000
+ex_class_19 destructor this = 00007FF6660C1F00
+ex_class_19 destructor this = 00007FF6660C1E00
+ex_class_19 destructor this = 00007FF6660C1D00
+ex_class_19 destructor this = 00007FF6660C1C00
+ex_class_19 destructor this = 00007FF6660C1B00
+ex_class_19 destructor this = 00007FF6660C1A00
+ex_class_19 destructor this = 00007FF6660C1900
+ex_class_19 destructor this = 00007FF6660C1800
+ex_class_19 destructor this = 00007FF6660C1700
+ex_class_19 destructor this = 00007FF6660C1600
+ex_class_19 destructor this = 00007FF6660C1500
+ex_class_19 destructor this = 00007FF6660C1400
+ex_class_19 destructor this = 00007FF6660C1300
+ex_class_19 destructor this = 00007FF6660C1200
+```
+---
+
+Example :
+```cpp
+class ex_class_20{
+public:
+	ex_class_20()
+	{
+		std::cout << "ex_class_20() this = " << this << '\n';
+	}
+
+	~ex_class_20()
+	{
+		std::cout << "ex_class_20 destructor this = " << this << '\n';
+	}
+	char buf[256]{};
+};
+
+void foo()
+{
+	ex_class_20 x;
+}		// because x  is automatic storage class, the life of the object ends here so destructor is called
+
+int main()
+{
+	std::cout << "main starting\n";
+	foo();
+	std::cout << "main ending\n";
+}
+```
+Output:
+```
+main starting
+ex_class_20() this = 0000001DC90FF6B0
+ex_class_20 destructor this = 0000001DC90FF6B0
+main ending
+```
+---
+Example :
+```cpp
+class ex_class_21 {
+public:
+	ex_class_21()
+	{
+		std::cout << "ex_class_21() this = " << this << '\n';
+	}
+
+	~ex_class_21()
+	{
+		std::cout << "ex_class_21 destructor this = " << this << '\n';
+	}
+	char buf[256]{};
+};
+
+void foo()
+{
+	ex_class_21 x;
+}		// because x  is automatic storage class, the life of the object ends here so destructor is called
+
+int main()
+{
+	std::cout << "main starting\n";
+	foo();
+	foo();
+	foo();
+	std::cout << "main ending\n";
+}
+```
+Output:
+```
+main starting
+ex_class_21() this = 000000B26155F6A0
+ex_class_21 destructor this = 000000B26155F6A0
+ex_class_21() this = 000000B26155F6A0
+ex_class_21 destructor this = 000000B26155F6A0
+ex_class_21() this = 000000B26155F6A0
+ex_class_21 destructor this = 000000B26155F6A0
+main ending
+```
+---
+
+Example :
+```cpp
+class ex_class_22 {
+public:
+	ex_class_22()
+	{
+		std::cout << "ex_class_22() this = " << this << '\n';
+	}
+
+	~ex_class_22()
+	{
+		std::cout << "ex_class_22 destructor this = " << this << '\n';
+	}
+};
+
+int main()
+{
+	std::cout << "main starting\n";
+	for (int i = 0; i < 10; ++i)
+	{	
+		ex_class_22 myclass;	// ctor and dtor will be called 10 times
+	}
+	std::cout << "main ending\n";
+}
+```
+Output:
+```
+main starting
+ex_class_22() this = 000000F1045BF934
+ex_class_22 destructor this = 000000F1045BF934
+ex_class_22() this = 000000F1045BF934
+ex_class_22 destructor this = 000000F1045BF934
+ex_class_22() this = 000000F1045BF934
+ex_class_22 destructor this = 000000F1045BF934
+ex_class_22() this = 000000F1045BF934
+ex_class_22 destructor this = 000000F1045BF934
+ex_class_22() this = 000000F1045BF934
+ex_class_22 destructor this = 000000F1045BF934
+ex_class_22() this = 000000F1045BF934
+ex_class_22 destructor this = 000000F1045BF934
+ex_class_22() this = 000000F1045BF934
+ex_class_22 destructor this = 000000F1045BF934
+ex_class_22() this = 000000F1045BF934
+ex_class_22 destructor this = 000000F1045BF934
+ex_class_22() this = 000000F1045BF934
+ex_class_22 destructor this = 000000F1045BF934
+ex_class_22() this = 000000F1045BF934
+ex_class_22 destructor this = 000000F1045BF934
+main ending
+```
+---
+
+Example :
+```cpp
+class ex_class_23 {
+public:
+	ex_class_23()
+	{
+		std::cout << "ex_class_23() this = " << this << '\n';
+	}
+
+	~ex_class_23()
+	{
+		std::cout << "ex_class_23 destructor this = " << this << '\n';
+	}
+};
+
+int main()
+{
+	std::cout << "main starting\n";
+	for (int i = 0; i < 10; ++i)
+	{
+		std::cout << "i = " << i << '\n';
+
+		static ex_class_23 myclass;		// ctor and dtor will be called once
+	}
+	std::cout << "main ending\n";
+}
+```
+Output:
+```
+main starting
+i = 0
+ex_class_23() this = 00007FF6A16C0200
+i = 1
+i = 2
+i = 3
+i = 4
+i = 5
+i = 6
+i = 7
+i = 8
+i = 9
+main ending
+ex_class_23 destructor this = 00007FF6A16C0200
+```
+---
+
+Example :
+```cpp
+class ex_class_24 {
+public:
+	ex_class_24()
+	{
+		std::cout << "ex_class_24() this = " << this << '\n';
+	}
+
+	~ex_class_24()
+	{
+		std::cout << "ex_class_24 destructor this = " << this << '\n';
+	}
+};
+
+int main()
+{
+	ex_class_24 myclass;		// constructor called only once
+	ex_class_24* ptr = &myclass;
+}
+```
+Output:
+```
+ex_class_24() this = 0000005C64CFF9B4
+ex_class_24 destructor this = 0000005C64CFF9B4
+```
+---
+Example :
+```cpp
+class ex_class_25 {
+public:
+	ex_class_25()
+	{
+		std::cout << "ex_class_25() this = " << this << '\n';
+	}
+
+	~ex_class_25()
+	{
+		std::cout << "ex_class_25 destructor this = " << this << '\n';
+	}
+};
+
+int main()
+{
+	ex_class_25 myclass;		// only one object created
+	ex_class_25& r1 = myclass;	// this doesn't create an object
+	ex_class_25& r2 = myclass;
+	ex_class_25& r3 = myclass;
+	ex_class_25& r4 = myclass;
+}
+```
+Output:
+```
+ex_class_25() this = 00000037DBEFF804
+ex_class_25 destructor this = 00000037DBEFF804
+```
+---
+
+Example: Print numbers from 1 to 100 without using loops.
+```cpp
+class ex_class_26 {
+public:
+	ex_class_26()
+	{
+		static int x = 0;
+		std::cout << "x = " << ++x << '\n';
+	}
+};
+
+int main()
+{
+	ex_class_26 arr[100];	// creates 100 objects of ex_class_26 class
+}
+```
+Output:
+```
+x = 1
+x = 2
+x = 3
+x = 4
+x = 5
+x = 6
+x = 7
+x = 8
+x = 9
+x = 10
+x = 11
+x = 12
+...
+x = 94
+x = 95
+x = 96
+x = 97
+x = 98
+x = 99
+x = 100
+```
+
+Example :
+```cpp
+class Logger {
+public:
+	Logger()
+	{
+		mf = std::fopen("logger.txt", "w");
+		///...
+	}
+	~Logger()
+	{
+		fclose(mf);
+	}
+	void foo()
+	{
+		std::fprintf(mf, "foo called\n");
+	}
+
+	void bar()
+	{
+		std::fprintf(mf, "bar called\n");
+	}
+private:
+	FILE* mf;
+};
+
+void foo()
+{
+	Logger lg;	// file opens when the object is created
+
+	lg.foo();
+	lg.bar();
+}				// life of object finishes here
+
+int main()
+{
+	foo();
+	// at this point, file is closed
+}
+```
+
+Example :
+```cpp
+struct ex_class_27 {
+	ex_class_27()
+	{
+		std::cout << "default ctor\n";
+	}
+
+	void print()const
+	{
+		std::cout << "mx = " << mx << "\n";
+	}
+	int mx;
+};
+
+int main()
+{
+	ex_class_27 myclass1;	// default initialization
+	// default ctor is called for default initialized objects
+
+
+	ex_class_27 myclass2{};	// value initialization
+	// default ctor is called for value initialized objects
+
+	
+	myclass1.print();		// undefined behavior because mx has garbage value
+	myclass2.print();		// zero-initialized, no undefined behavior here, mx = 0
+
+}
+```
+
+Example :
+```cpp
+struct ex_class_28 {
+	void print()const
+	{
+		std::cout << "mx = " << mx << "\n";
+	}
+	int mx;
+};
+
+ex_class_28 myclass;		// default initialization
+				// no undefined-behavior because the object has static life-span
+				//! static objects, before initialization, get zero-initialized
+int main()
+{
+	myclass.print();
+}
+```
+
+Example :
+```cpp
+struct ex_class_29 {
+public:
+	ex_class_29(int x)
+	{
+		std::cout << "ex_class_29(int x) x = " << x << "this = " << this << "\n";
+	}
+};
+
+int main()
+{
+	ex_class_29 class1(45);		// direct initialization
+	std::cout << "&class1 = " << &class1 << '\n';	// class1 and this have same address
+}
+```
+
+Example :
+```cpp
+struct ex_class_30 {
+public:
+	ex_class_30(int x)
+	{
+		std::cout << "ex_class_30(int x) x = " << x << "this = " << this << "\n";
+	}
+};
+
+int main()
+{
+	ex_class_30 class1{67};		// direct list initialization
+	std::cout << "&class1 = " << &class1 << '\n';
+}
+```
+
+Example :
+```cpp
+struct ex_class_31 {
+public:
+	ex_class_31(int x)
+	{
+		std::cout << "ex_class_31(int x) x = " << x << "this = " << this << "\n";
+	}
+};
+
+int main()
+{
+	ex_class_31 class1 = 10;	// copy initialization
+}
+```
+
+Example :
+```cpp
+struct ex_class_32 {
+public:
+	ex_class_32()
+	{
+		std::cout << "ex_class_32 this = " << this << "\n";
+	}
+
+	ex_class_32(int x)
+	{
+		std::cout << "ex_class_32(int x) x = " << x << "this = " << this << "\n";
+	}
+};
+
+int main()
+{
+	ex_class_32 class1;		// default initialization
+	ex_class_32 class2{};		// value initialization
+	ex_class_32 class3(12);		// direct initialization
+	ex_class_32 class4{36};		// direct list initialization
+	ex_class_32 class5 = 65;	// copy initialization
+}
+```
+
+Example :
+```cpp
+struct ex_class_33 {
+public:
+	ex_class_33()
+	{
+		std::cout << "ex_class_33 this = " << this << "\n";
+	}
+
+	ex_class_33(int x)
+	{
+		std::cout << "ex_class_33(int x) x = " << x << "this = " << this << "\n";
+	}
+
+	ex_class_33(double x)
+	{
+		std::cout << "ex_class_33(double x) x = " << x << "this = " << this << "\n";
+	}
+
+	ex_class_33(int x, int y)
+	{
+		std::cout << "ex_class_33(int x, int y) x = " << x << "y = " << y << "this = " << this << "\n";
+	}
+};
+
+int main()
+{
+	ex_class_33 class1;		// default ctor called
+	ex_class_33 class2(45);		// ex_class_33(int x) called
+	ex_class_33 class3(4.5f);	// ex_class_33(double x) called
+	ex_class_33 class4(4.5L);	// syntax error, ambiguity
+	
+	ex_class_33 class5 = { 3,5 };	// ex_class_33(int x, int y) called
+}
+```
+
+Example :
+```cpp
+class ex_class_34{
+
+public:
+	~ex_class_34()
+	{
+		std::cout << "destructor\n";
+	}
+};
+
+int main()
+{
+	ex_class_34 myclass;	// destructor gets called
+				// what about constructor? :o
+				// default constructor called which was written by compiler
+}
+```
+
+Example :
+```cpp
+class ex_class_35 {
+
+public:
+	ex_class_35() = default;		// i ask the compiler to write the constructor
+	~ex_class_35()
+	{
+		std::cout << "destructor\n";
+	}
+};
+
+int main()
+{
+	ex_class_35 myclass;
+}
+```
 
 
 Example :
 ```cpp
+
+```
+Output:
+```
 
 ```
