@@ -1181,6 +1181,230 @@ int main()
 }
 ```
 
+Example :
+```cpp
+class ex_class_36 {
+
+public:
+	ex_class_36(int) {};
+
+};
+
+int main() {
+	ex_class_36 myclass;	// syntax error : no appropriate default constructor available
+}
+```
+Output:
+> syntax error : no appropriate default constructor available
+
+---
+
+## Special Member Functions
+Special member functions can be:
+
+**1. User Declared**
+   
+   **- defined**
+```cpp
+class ex_class_37 {
+
+public:
+	ex_class_37();				// user declared defined
+
+};
+```
+
+   **- defaulted**
+```cpp
+class ex_class_38 {
+
+public:
+	ex_class_38() = default;	// user declared defaulted
+	// i am declaring it, but the compiler will define it
+};
+```
+   **- deleted**
+```cpp
+class ex_class_39 {
+
+public:
+	ex_class_39() = delete;	// user declared
+	// i am declaring it, but calling this function is a syntax error
+};
+```
+
+**2. implicitly declared**
+ 
+   **- defaulted**
+
+```cpp
+class ex_class_40 {
+public:
+	// this class has default constructor
+	// has destructor
+	// none is user declared
+	// both are implicitly declared
+};
+```
+```cpp
+class ex_class_41 {
+public:
+	// the compiler declares and defines constructor and destructor
+	// implicitly declared defaulted
+};
+
+int main()
+{
+	ex_class_41 m;
+}
+```
+
+
+  **- deleted**
+
+```cpp
+class ex_class_42 {
+
+	const int x;
+
+	// this class has default constructor, it is implicitly declared
+};
+
+int main()
+{
+	ex_class_42 m;		// syntax error, the default constructor cannon be referenced - it is a deleted function
+	// implicitly declared deleted
+}
+```
+Output:
+> syntax error, the default constructor cannon be referenced - it is a deleted function
+
+**3. not declared**
+
+```cpp
+struct ex_struct_1 {
+	ex_struct_1(int);	// default constructor is NOT 'user declared'
+	// default constructor is NOT 'implicitly declared'
+	// default constructor is 'not declared'
+};
+
+int main()
+{
+	ex_struct_1 struct_1;	// error : no default constructor exists
+}
+```
+Output:
+> error : no default constructor exists
+
+---
+
+Example :
+```cpp
+class ex_class_43 {
+public:
+	ex_class_43()
+	{
+		mx = 0;		// assignment, not initialization
+		my = 0;		// when the program enters the constructor block, member variables have already been initialized
+	}
+
+private:
+	int mx, my;
+};
+```
+
+Example :
+```cpp
+class ex_class_44 {
+public:
+	ex_class_44()
+	{
+
+	}
+
+private:
+	int& r;			// syntax error, references do not get default initialized
+				// references must be initialized
+
+	const int x;	// const objects do not get default initialized
+			// an object of const-qualified type must be initialized
+};
+```
+Output:
+> syntax error, references do not get default initialized
+
+---
+
+## Constructor (Member) Initializer List
+This is a syntax that only constructors can use.
+
+Example :
+```cpp
+class ex_class_45 {
+public:
+	ex_class_45();		// constructor : user declared declaration
+private:
+	int mx;
+	double my;
+	//
+};
+
+```
+```cpp
+ex_class_45::ex_class_45() : mx(5), my(7.5)		// valid syntax
+{
+	//
+}
+```
+```cpp
+ex_class_45::ex_class_45() : mx{ 5 }, my{ 7.5 }
+{
+	// also valid syntax, but narrowing conversion will cause syntax error
+}
+```
+---
+Example :
+
+In C++, const members must be initialized when an object is created. Since mx is not given a value in the constructor initializer list, the compiler will generate an error.
+
+```cpp
+class ex_class_46 {
+public:
+	ex_class_46();
+private:
+	const int mx;
+};
+
+ex_class_46::ex_class_46()
+{
+	// syntax error : an object of const - qualified type must be initialized	
+}
+```
+Output:
+> syntax error : an object of const - qualified type must be initialized
+---
+
+Example :
+
+In C++, reference members must be initialized when an object is created. This is because references must always refer to an object; they cannot exist without being bound to an object. The constructor in ```ex_class_47``` does not initialize the reference member r, leading to a ```compilation error```.
+
+```cpp
+class ex_class_47 {
+public:
+	ex_class_47();
+private:
+	int& r;
+};
+
+ex_class_47::ex_class_47()
+{
+	// syntax error : references do not get default initialized
+}
+```
+Output:
+> syntax error : references do not get default initialized
+
+
 
 Example :
 ```cpp
