@@ -1338,7 +1338,7 @@ Output:
 ## Constructor (Member) Initializer List
 This is a syntax that only constructors can use.
 
-Example :
+**Example :**
 ```cpp
 class ex_class_45 {
 public:
@@ -1362,8 +1362,10 @@ ex_class_45::ex_class_45() : mx{ 5 }, my{ 7.5 }
 	// also valid syntax, but narrowing conversion will cause syntax error
 }
 ```
+
 ---
-Example :
+
+**Example :**
 
 In C++, const members must be initialized when an object is created. Since mx is not given a value in the constructor initializer list, the compiler will generate an error.
 
@@ -1384,7 +1386,7 @@ Output:
 > syntax error : an object of const - qualified type must be initialized
 ---
 
-Example :
+**Example :**
 
 In C++, reference members must be initialized when an object is created. This is because references must always refer to an object; they cannot exist without being bound to an object. The constructor in ```ex_class_47``` does not initialize the reference member r, leading to a ```compilation error```.
 
@@ -1404,13 +1406,424 @@ ex_class_47::ex_class_47()
 Output:
 > syntax error : references do not get default initialized
 
+---
+What is the difference between these two?
+The two classes provided, ```ex_class_48``` and ```ex_class_49```, demonstrate two different methods of initializing member variables.
+```cpp
+class ex_class_48 {
+public:
+	ex_class_48(int x) : mx(x) {}	// here mx is firstly default initialized, then assigned 
+private:
+	int mx;
+};
+```
+In ```ex_class_48```, the member variable ```mx``` is directly initialized using the constructor's member initializer list ```(: mx(x) {})```. This is known as **direct initialization**.
 
+```cpp
+class ex_class_49 {
+public:
+	ex_class_49(int x)
+	{
+		mx = x;
+	}
+private:
+	int mx;
+};
+```
+In ```ex_class_49```, ```mx``` is **default-initialized** and then assigned a value within the constructor body. Since ```mx``` is of a primitive type (int), default initialization for this type when occurring inside a class means that ```mx``` will be uninitialized (holding an indeterminate value) before it gets assigned the value of ```x``` inside the constructor body.
+
+---
+
+## Order of Initialization of Class Members
+
+In C++, the order of initialization of class members is determined by the order of their declaration in the class, not by the order they are listed in the constructor's member initializer list.
 
 Example :
 ```cpp
+class ex_class_50 {
+public:
+    ex_class_50(int a) : my(a), mx(my / 3) {}
+    // undefined behavior because 'my' has not yet been initialized and holds an indeterminate value at the time 'mx' is being initialized
+private:
+    int mx, my; // first mx, then my
+};
+```
 
+---
+
+Example :
+```cpp
+class ex_class_51 {
+public:
+	ex_class_51() :x(10) {}
+
+	void print()const
+	{
+		std::cout << "x = " << x << '\n';
+	}
+private:
+	int x;
+};
+
+int main()
+{
+	ex_class_51 ex;
+	ex.print();
+
+}
 ```
 Output:
 ```
+x = 10
+```
 
+---
+
+Example :
+```cpp
+class ex_class_52 {
+public:
+	ex_class_52() {}
+
+	void print()const
+	{
+		std::cout << "x = " << x << '\n';	// undefined behavior
+	}
+private:
+	int x;
+};
+
+int main()
+{
+	ex_class_52 ex;
+	ex.print();
+
+}
+```
+
+---
+
+Example :
+```cpp
+class ex_class_53 {
+public:
+	ex_class_53(int val) : x(val) {}
+
+	void print()const
+	{
+		std::cout << "x = " << x << '\n';
+	}
+private:
+	int x;
+};
+
+int main()
+{
+	ex_class_53 ex;	// syntax error, no default constructor exists for class ex_class_53
+	ex.print();
+
+}
+```
+
+---
+
+Example :
+```cpp
+class ex_class_54 {
+public:
+	ex_class_54(int val) : x(val) {}
+
+	void print()const
+	{
+		std::cout << "x = " << x << '\n';
+	}
+private:
+	int x;
+};
+
+int main()
+{
+	ex_class_54 ex(45);
+	ex.print();
+}
+```
+Output:
+```
+x = 45
+```
+
+---
+
+Example :
+
+The first ```x``` (after the colon) refers to the **member variable** of the class ```ex_class_55```.
+The second ```x``` (inside the parentheses) refers to the **parameter** passed to the constructor.
+While this approach is syntactically correct and works as intended, it may lead to confusion for someone reading the code, 
+especially in more complex classes or functions. 
+
+```cpp
+class ex_class_55 {
+public:
+	ex_class_55(int x) : x(x) {}
+	// the first 'x' is searched in class scope
+	// the 'x' inside the parantheses is searched as argument variable
+	void print()const
+	{
+		std::cout << "x = " << x << '\n';
+	}
+private:
+	int x;
+};
+
+int main()
+{
+	ex_class_55 ex(45);
+	ex.print();
+}
+```
+Output:
+```
+x = 45
+```
+
+---
+
+Example :
+```cpp
+class ex_class_56 {
+public:
+	ex_class_56() : x(x) {}		// 'x' is initialized with its own garbage value
+	void print()const
+	{
+		std::cout << "x = " << x << '\n';
+	}
+private:
+	int x;
+};
+```
+
+Example :
+```cpp
+class ex_class_57 {
+public:
+	ex_class_57(int x) : mx(x) {}
+	void print()const
+	{
+		std::cout << "mx = " << mx << '\n';		// mx = 45
+		std::cout << "my = " << my << '\n';		// garbage value
+	}
+private:
+	int mx, my;
+};
+
+int main()
+{
+	ex_class_57 ex(45);
+	ex.print();
+}
+```
+Output:
+```
+mx = 45
+my = -858993460 (garbage value)
+```
+
+
+## Default Member Initializer
+
+This feature provides a default value for a member that will be used unless an initializer is provided 
+at the point of object creation or in the constructor's member initializer list.
+
+Example :
+```cpp
+class ex_class_58 {
+public:
+
+private:
+	int mx = 0;		// this syntax came with modern C++ ( C++11 )
+	// Default Member Initializer
+	// or In-Class Initializer
+};
+```
+
+Example :
+```cpp
+class ex_class_59 {
+public:
+	ex_class_59()	// if i write the constructor like this, the compiler will put ' : mx(0) '
+	{
+	}
+private:
+	int mx = 0;
+};
+```
+
+Example :
+```cpp
+class ex_class_60 {
+public:
+
+	ex_class_60() : mx(45)	 // okay, default member initializer not used
+	{
+
+	}
+
+	void print()const
+	{
+		std::cout << "mx = " << mx << '\n';
+	}
+
+private:
+	int mx = 0;
+
+};
+
+int main()
+{
+	ex_class_60 ex;
+	ex.print();
+}
+```
+
+Output:
+```
+mx = 45
+```
+
+---
+
+Example :
+```cpp
+class ex_class_61 {
+public:
+
+	ex_class_61()
+	{
+
+	}
+
+	void print()const
+	{
+		std::cout << "mx = " << mx << '\n';
+	}
+
+private:
+	int mx{ 765 };	// legal
+	//int mx( 765 );	// illegal
+};
+
+int main()
+{
+	ex_class_61 ex;
+	ex.print();
+}
+```
+Output:
+```
+mx = 765
+```
+---
+
+Example :
+```cpp
+class Point {
+public:
+	void print() const
+	{
+		std::cout << mx << " " << my << " " << mz << '\n';	// undefined behavior
+	}
+
+private:
+	int mx, my, mz;
+};
+
+int main()
+{
+	Point mypoint;		// constructer is implicitly declared defaulted
+	myclass.print();
+}
+```
+---
+
+Example :
+```cpp
+class Point {
+public:
+	// the compiler writes: Point() : mx(0), my(0), mz(0) {}
+	void print() const
+	{
+		std::cout << mx << " " << my << " " << mz << '\n';
+	}
+
+private:
+	int mx = 0, my = 0, mz = 0;
+};
+
+int main()
+{
+	Point mypoint;		// constructer is implicitly declared defaulted
+	myclass.print();
+}
+```
+
+Output:
+```
+0 0 0
+```
+---
+Example :
+```cpp
+class Point {
+public:
+	
+	Point() :mx(1), my(1), mz(1) {}
+	
+	void print() const
+	{
+		std::cout << mx << " " << my << " " << mz << '\n';
+	}
+
+private:
+	int mx = 0, my = 0, mz = 0;
+};
+
+int main()
+{
+	Point mypoint;
+	myclass.print();
+}
+```
+
+Output:
+```
+1 1 1
+```
+---
+
+Example :
+```cpp
+class Point {
+public:
+	
+	Point() :mx(1){}	// default member initializer used for my and mz
+	
+	void print() const
+	{
+		std::cout << mx << " " << my << " " << mz << '\n';
+	}
+
+private:
+	int mx = 0, my = 0, mz = 0;
+};
+
+int main()
+{
+	Point mypoint;
+	myclass.print();
+}
+```
+
+Output:
+```
+1 0 0
 ```
