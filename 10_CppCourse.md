@@ -327,12 +327,27 @@ If a situation that violates the rules of the language (syntax error) occurs whe
 
 ### Examples of the Rule:
 
-```cpp
+Example 1 :
 
+In C++, a constant member variable must be initialized when it is **declared**, or through a **Constructor Initializer List**.
+
+```cpp
+// there is no syntax error in this code
+// default constructor is deleted
+// implicitly declared deleted
+class ex_class8 {
+
+	const int x;
+};
+
+// there will be syntax error when this deleted function is called
+int main() {
+	ex_class8 ex;
+}
 ```
 Output:
 ```
-
+Error : the default ctor of "ex_class8" cannot be referenced - it is a deleted function
 ```
 
 
