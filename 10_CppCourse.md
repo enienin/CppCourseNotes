@@ -327,12 +327,11 @@ If a situation that violates the rules of the language (syntax error) occurs whe
 
 ### Examples of the Rule:
 
-Example 1 :
+### Example 1 :
 
-In C++, a constant member variable must be initialized when it is **declared**, or through a **Constructor Initializer List**.
+In C++, a ```constant member variable``` must be initialized when it is **declared**, or through a **Constructor Initializer List**.
 
 ```cpp
-// there is no syntax error in this code
 // default constructor is deleted
 // implicitly declared deleted
 class ex_class8 {
@@ -349,6 +348,158 @@ Output:
 ```
 Error : the default ctor of "ex_class8" cannot be referenced - it is a deleted function
 ```
+
+
+### Example 2 :
+
+Similar to const members, ```reference members``` must be initialized when an object is created. 
+This requirement exists because references in C++ must refer to an object, they cannot be null and they cannot be 
+re-assigned to refer to a different object after initialization.
+
+In this example, the default constructor is deleted. 
+The default constructor is ```implicitly declared deleted```.
+
+```cpp
+class ex_class9 {
+
+	int& r;
+};
+
+int main() {
+	ex_class9 ex;
+}
+```
+Output:
+```
+Error : the default ctor of "ex_class9" cannot be referenced - it is a deleted function
+```
+
+### Example 3 :
+
+The error in the provided code stems from the inability to implicitly instantiate the ```ex_class10``` member ```mc``` within ```ex_class11``` due to the lack of a **default constructor** in ```ex_class10```.
+The ```ex_class10``` class only defines a constructor that takes an int parameter, and since C++ requires an object to be initialized upon creation, the compiler looks for a default constructor when attempting to instantiate ```mc``` within ```ex_class11```.
+Since no such constructor exists for ```ex_class10```, and ```ex_class11``` does not explicitly initialize ```mc``` in its initialization list, the compiler will generate an error.
+
+```cpp
+class ex_class10 {
+public:
+	ex_class10(int);	// ex_class10::ex_class10(void) function definition not found
+				// no default constructor
+};
+
+class ex_class11 {
+
+	ex_class10 mc;
+};
+
+int main()
+{
+	ex_class11 m;	
+}
+```
+Output:
+```
+Error : the default constructor of "ex_class11" cannot be referenced -- it is a deleted function
+```
+
+### Example 4 :
+
+There is no problem in this code.
+
+```cpp
+class ex_class12 {
+public:
+	ex_class12();
+};
+
+class ex_class13 {
+
+	ex_class12 mc;
+};
+
+int main()
+{
+	ex_class13 m;
+}
+```
+
+### Example 5 :
+
+The issue in the provided code arises because ```ex_class14``` has a ```private default constructor```, which is not accessible from ```ex_class15```. 
+Consequently, ```ex_class15``` cannot implicitly use the default constructor of ```ex_class14``` to initialize its member ```mc```. 
+
+C++ class members must be initialized when an instance of the class is created, and since ```ex_class15```'s default constructor implicitly attempts to call the default constructor of ```ex_class14``` for ```mc```, it fails due to the ```access level```.
+
+```cpp
+class ex_class14 {
+	ex_class14();
+};
+
+class ex_class15 {
+
+	ex_class14 mc;
+};
+
+int main()
+{
+	ex_class15 m;	// the default constructor of "ex_class15" cannot be referenced -- it is a deleted function
+}
+```
+
+### Example 6 :
+
+```cpp
+class ex_class16 {
+public:
+	ex_class16() = delete;
+};
+
+class ex_class17 {
+
+	ex_class16 mc;
+};
+
+int main()
+{
+	ex_class17 m;	// the default constructor of "ex_class17" cannot be referenced -- it is a deleted function
+}
+```
+
+---
+
+## IMPORTANT RULE
+
+**If you declare any constructor to the class, the compiler does not declare a default constructor.**
+
+If you do not explicitly declare any constructor in a class, the compiler will implicitly declare a default constructor for you. However, as soon as you declare a constructor that takes one or more parameters, the compiler does not implicitly declare a default constructor anymore.
+
+Example:
+```cpp
+class ex_class18 {
+public:
+	ex_class18(int);	// default constructor not declared
+};
+```
+
+Example:
+```cpp
+class A {
+public:
+	A(int);		// doesn't have default constructor, default constructor not declared
+};
+```
+
+Example:
+```cpp
+class B {
+public:
+	B(const B&);	// copy constructor
+			// this class has no default ctor, it is NOT implicitly declared
+};
+```
+---
+
+
 
 
 Example:
