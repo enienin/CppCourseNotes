@@ -499,6 +499,98 @@ public:
 ```
 ---
 
+### Is there a difference between writing "C() = default;" and not declaring the ctor at all ?
+
+Yes, there is. Not, on the code written by the compiler, but on the status of the ctor.
+
+```cpp
+class C {
+public:
+	C() = default;	// ctor is user declared 
+};
+```
+```cpp
+class D {
+public:
+	// ctor is implicitly declared
+};
+```
+
+---
+
+Example:
+
+```cpp
+class ex_class18 {
+public:
+	ex_class18();	// user declared ctor and the definition should be written by us
+};
+
+int main()
+{
+	ex_class18 ex;
+}
+```
+
+Output:
+
+```
+Linkage Error : function definition for "ex_class18" not found.
+```
+
+---
+
+Example:
+
+```cpp
+class ex_class19 {
+public:
+	ex_class19() = default;	 // user declared defaulted
+};
+
+int main()
+{
+	ex_class19 ex;
+}
+```
+
+---
+
+Example:
+
+```cpp
+class ex_class20 {
+public:
+	ex_class20() {};	 // user declared defined 
+};
+
+int main()
+{
+	ex_class20 ex;
+}
+```
+
+---
+
+Example:
+
+```cpp
+class ex_class21 {
+public:
+	ex_class21() = delete;	// user declared deleted
+};
+
+int main()
+{
+	ex_class21 ex;	// compile time error
+}
+```
+Output:
+```
+Error : the default constructor of "ex_class21" cannot be referenced -- it is a deleted function
+```
+
+
 
 
 
