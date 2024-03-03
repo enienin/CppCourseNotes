@@ -590,6 +590,191 @@ Output:
 Error : the default constructor of "ex_class21" cannot be referenced -- it is a deleted function
 ```
 
+---
+
+## How the compiler writes copy ctor?
+```
+class ex_class22 {
+public:
+	ex_class22(const ex_class22& other) : tx(other.tx), ux(other.ux), wx(other.wx) {}
+private:
+	T tx;
+	U ux;
+	W wx;
+};
+```
+
+---
+
+## Rule of Zero
+
+If a class does not manage resources directly (i.e., it does not perform custom actions in its destructor, copy constructor, move constructor, copy assignment operator, or move assignment operator), it should not explicitly define these special member functions.
+
+```cpp
+class Student {
+private:
+	std::string name;
+	std::vector<int> grades;
+};
+```
+> compiler writes the ctor
+> compiler default initializes name and grades as empty str and empty vector
+
+## Value Type
+
+Every object has its own value.
+```T x = y;``` there is no connection between 'x' and 'y' after initialization (if T is value type), later if i change 'x' , 'y' won't change and vice versa
+
+---
+
+Example:
+```cpp
+class ex_class23 {
+public:
+	ex_class23(int day, int mon, int year) : day_(day), month_(mon), year_(year) {}
+	//
+	void print()const
+	{
+		std::cout << day_ << '-' << month_ << '-' << year_ << '\n';
+	}
+private:
+	int day_;
+	int month_;
+	int year_;
+};
+
+int main()
+{
+	ex_class23 dx{ 11,2,2024 };
+	ex_class23 dy = dx;		// copy ctor is called for 'dy'
+	dx.print();
+	dy.print();
+}
+```
+Output:
+```
+11-2-2024
+11-2-2024
+```
+> it is not necessary to write the copy constructor ourselves in this case, there is nothing wrong with the copy ctor the compiler writes
+
+---
+
+Example:
+```cpp
+class ex_class24 {
+public:
+	ex_class24(int day, int mon, int year) : day_(day), month_(mon), year_(year) {}
+
+	// copy ctor
+	ex_class24(const ex_class24& other) : day_(other.day_), month_(other.month_), year_(other.year_) {};
+
+	void print()const
+	{
+		std::cout << day_ << '-' << month_ << '-' << year_ << '\n';
+	}
+private:
+	int day_;
+	int month_;
+	int year_;
+};
+
+int main()
+{
+	ex_class24 dx{ 11,2,2024 };
+	ex_class24 dy = dx;		// copy ctor is called for 'dy'
+	dx.print();
+	dy.print();
+}
+```
+
+---
+
+```Shallow copy``` : both the original and the copied object will point to the same memory locations for their pointer members.
+
+```Deep copy``` : any dynamically allocated memory or resources held by the original object are also allocated a new and copied over for the new object.
+
+In this case, the compiler can write the copy ctor:
+```cpp
+class Person {
+private:
+	std::string name;
+	std::string surname;
+	std::string address;
+};
+```
+
+In this case, the compiler shouldn't write the copy ctor :
+```cpp
+class Person2 {
+private:
+	char* pname;
+	char* psurname;
+	char* paddress;
+};
+```
+> The compiler-generated versions simply copy the values of each member,including pointer values.
+> This means that after a copy, both the original and the copied Person2 objects will have pointers (pname, psurname, paddress)
+> pointing to the same memory locations.
+---
+
+## Example where the programmer should write the copy ctor
+
+```cpp
+#define _CRT_SECURE_NO_WARNINGS
+#include <iostream>
+#include<string>
+#include<cstdlib>
+#include<cstring>
+
+class Sentence {
+public:
+	Sentence(const char* p) : mlen(std::strlen(p)),
+		mp(static_cast<char*>(std::malloc(mlen + 1)))
+	{
+		if (!mp) {
+			std::cerr << "not enough memory\n";
+			std::exit(EXIT_FAILURE);
+		}
+		std::strcpy(mp, p);
+	}
+
+	~Sentence()
+	{
+		if (mp)
+			std::free(mp);
+	}
+
+	void print()const
+	{
+		std::cout << '[' << mp << ']' << '\n';
+	}
+
+	std::size_t length()const
+	{
+		return mlen;
+	}
+
+private:
+	std::size_t mlen;	// length of sentence
+	char* mp;	// will hold the address of the sentence
+};
+
+int main()
+{
+	Sentence s1{ "Today is 1st of February." };
+	s1.print();
+	auto len = s1.length();
+
+	std::cout << "length = " << len << '\n';
+	//...
+}
+```
+
+Output:
+```
+
+```
 
 
 
